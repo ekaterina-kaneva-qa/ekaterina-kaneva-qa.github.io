@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Битва за Прод</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1c1c1c;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: #2a2a2a;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 0 1rem rgba(0,0,0,0.5);
+      margin-bottom: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    .button {
+      background: #6c63ff;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .button:hover {
+      background: #574fd6;
+    }
+    .log {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <!-- Уровень 1 -->
+  <div class="card" id="battleCard1">
+    <h2>🐞 Уровень 1: Lil’ UI bug</h2>
+    <p>Описание: Крестик закрытия убежал за границу окна. Хочет быть свободным.</p>
+    <p><strong>Твои HP:</strong> <span id="playerHP1">100</span> | <strong>HP Бага:</strong> <span id="bugHP1">70</span></p>
+    <p>Выбери способность:</p>
+    <button class="button" onclick="chooseBug1('devtools')">🛠 DevTools → Toggle device toolbar</button>
+    <button class="button" onclick="chooseBug1('zoom')">🔍 Увеличить масштаб страницы</button>
+    <div class="log" id="log1"></div>
+  </div>
+
+  <!-- Уровень 2 -->
+  <div class="card" id="battleCard2" style="display:none">
+    <h2>🐞 Уровень 2: Цифра изгнания: 60</h2>
+    <p>Описание: Возраст 60 не принимается при регистрации, хотя он допустим.</p>
+    <p><strong>Твои HP:</strong> <span id="playerHP2">100</span> | <strong>HP Бага:</strong> <span id="bugHP2">100</span></p>
+    <p>Выбери способность:</p>
+    <button class="button" onclick="chooseBug2('boundaries')">⚠️ Граничные значения</button>
+    <button class="button" onclick="chooseBug2('equiv')">📊 Классы эквивалентности</button>
+    <button class="button" onclick="chooseBug2('ignore')">😶 Сделать вид, что так и надо</button>
+    <button class="button" onclick="chooseBug2('clearcookies')">🍪 Очистить куки и кэш</button>
+    <div class="log" id="log2"></div>
+  </div>
+
+  <!-- Уровень 3 -->
+  <div class="card" id="battleCard3" style="display:none">
+    <h2>🐞 BOSS</h2>
+    <p>Описание: Ты меняешь адрес, сохраняешь, обновляешь страницу — но система делает вид, что ничего не было.<br>«Изменения? Какие изменения? Я — старый адрес!»</p>
+    <p><strong>Твои HP:</strong> <span id="playerHP3">100</span> | <strong>HP Бага:</strong> <span id="bugHP3">150</span></p>
+    <p>Выбери способность:</p>
+    <button class="button" onclick="chooseBug3('network')">🌐 DevTools → Network</button>
+    <button class="button" onclick="chooseBug3('console')">📟 DevTools → Console</button>
+    <button class="button" onclick="chooseBug3('sql')">🧮 SQL-запрос в БД</button>
+    <button class="button" onclick="chooseBug3('smoke')">💨 Smoke-тесты</button>
+    <button class="button" onclick="chooseBug3('reboot')">🔁 Перезапустить браузер</button>
+    <div class="log" id="log3"></div>
+  </div>
+
+  <button class="button" id="restartButton" style="display:none" onclick="restartGame()">🔄 Сразиться снова</button>
+
+  <script>
+    let playerHP = 100;
+
+    function updatePlayerHPAll() {
+      document.getElementById('playerHP1').textContent = playerHP;
+      document.getElementById('playerHP2').textContent = playerHP;
+      document.getElementById('playerHP3').textContent = playerHP;
+    }
+
+    // Уровень 1 логика
+    let bugHP1 = 70;
+    const log1 = document.getElementById('log1');
+
+    function chooseBug1(action) {
+      if (action === 'devtools') {
+        bugHP1 = 0;
+        log1.textContent = '✅ Ты поймал крестик с помощью DevTools. Победа!';
+        document.getElementById('battleCard1').style.display = 'none';
+        document.getElementById('battleCard2').style.display = 'block';
+      } else {
+        playerHP = 0;
+        log1.textContent = '❌ Ты увеличил масштаб. Крестик стал ещё дальше. Проигрыш.';
+        disableButtons('battleCard1');
+        document.getElementById('restartButton').style.display = 'block';
+      }
+      bugHP1 = Math.max(bugHP1, 0);
+      playerHP = Math.max(playerHP, 0);
+      updatePlayerHPAll();
+      document.getElementById('bugHP1').textContent = bugHP1;
+    }
+
+    // Уровень 2 логика
+    let bugHP2 = 100;
+    let hits2 = 0;
+    const log2 = document.getElementById('log2');
+    let usedAbilities2 = new Set();
+
+    function chooseBug2(action) {
+      if (usedAbilities2.has(action)) return;
+      usedAbilities2.add(action);
+      if (action === 'boundaries' || action === 'equiv') {
+        hits2++;
+        bugHP2 -= 50;
+        playerHP -= 5;
+        log2.textContent += `\n✅ Подходящая способность. Багу больно.`;
+      } else {
+        playerHP -= 50;
+        log2.textContent += `\n❌ Неправильная способность. Баг бьёт!`;
+      }
+      bugHP2 = Math.max(bugHP2, 0);
+      playerHP = Math.max(playerHP, 0);
+      updatePlayerHPAll();
+      document.getElementById('bugHP2').textContent = bugHP2;
+
+      if (bugHP2 <= 0) {
+        log2.textContent += '\n🎉 Баг побеждён!';
+        document.getElementById('battleCard2').style.display = 'none';
+        document.getElementById('battleCard3').style.display = 'block';
+      }
+      if (playerHP <= 0) {
+        log2.textContent += '\n💀 Ты проиграл. Начни сначала.';
+        disableButtons('battleCard2');
+        document.getElementById('restartButton').style.display = 'block';
+      }
+    }
+
+    // Уровень 3 логика
+    let bugHP3 = 150;
+    const log3 = document.getElementById('log3');
+    let usedAbilities3 = new Set();
+
+    function chooseBug3(action) {
+      if (usedAbilities3.has(action)) return;
+      usedAbilities3.add(action);
+
+      if (action === 'network' || action === 'console' || action === 'sql') {
+        bugHP3 -= 50;
+        playerHP -= 10;
+        log3.textContent += `\n✅ Удар по багу! Он теряет часть своей иллюзии.`;
+      } else {
+        playerHP -= 50;
+        log3.textContent += `\n❌ Баг наказывает за неосознанность. Боль.`;
+      }
+
+      bugHP3 = Math.max(bugHP3, 0);
+      playerHP = Math.max(playerHP, 0);
+      updatePlayerHPAll();
+      document.getElementById('bugHP3').textContent = bugHP3;
+
+      if (bugHP3 <= 0) {
+        log3.textContent += '\n🎉 Победа над боссом! Прод очищен.';
+        disableButtons('battleCard3');
+        document.getElementById('restartButton').style.display = 'block';
+      }
+      if (playerHP <= 0) {
+        log3.textContent += '\n💀 Ты пал. Босс ещё силён.';
+        disableButtons('battleCard3');
+        document.getElementById('restartButton').style.display = 'block';
+      }
+    }
+
+    function disableButtons(cardId) {
+      const card = document.getElementById(cardId);
+      const buttons = card.querySelectorAll('.button');
+      buttons.forEach(btn => btn.disabled = true);
+    }
+
+    function restartGame() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>
