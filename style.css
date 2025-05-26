@@ -8,6 +8,10 @@ body {
   align-items: center;
 }
 
+.header {
+  position: relative;
+}
+
 .bug-link {
   position: absolute; 
   bottom: -105px;       
